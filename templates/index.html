@@ -1,0 +1,30 @@
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <title>LLM Sandbox</title>
+    </head>
+    <body>
+        <form action="/llm" method="post" enctype="multipart/form-data" style="position:absolute;left:84px;top:101px;">
+            <label for="language_model" style="position:absolute;left:97px;top:-44px;width:133.344px;font-size:11px;">Select a Model:</label>
+            <select name="model" id="model" required style="position:absolute;left:239px;top:-44px;">
+                <option value="1">GPT4All</option>
+                <option value="2">OpenAI</option>
+            </select>
+            <br>
+<label for="use_case" style="position:absolute;left:99px;top:22px;width:127.281px;transform-origin:63.6328px 7px;font-size:11px;">Select a use case:</label>
+            <select name="usecase" id="usecase" required style="position:absolute;left:239px;top:22px;">
+                <option value="1">Query document</option>
+                <option value="2">Summarize document</option>
+            </select>
+            <br>
+<label for="document" style="position:absolute;left:98px;top:91px;width:128.188px;font-size:11px;">Select document:</label>
+            <input type="file" id="myFile" name="filename" required style="position:absolute;left:238px;top:92px;">
+            <br>
+<label for="query" style="position:absolute;left:104px;top:173px;width:105.344px;font-size:11px;">Enter your query:</label>
+            <textarea id="query" name="query" rows="4" cols="50" required style="position:absolute;left:237px;top:173px;">Type your query here</textarea>
+            <br>
+<input type="submit" value="Submit" style="position:absolute;left:602px;top:270px;">
+        </form>
+    </body>
+</html>
+<span style="position:absolute;left:617px;top:42px;"></span>
