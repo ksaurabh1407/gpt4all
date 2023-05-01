@@ -15,6 +15,4 @@ client = chromadb.Client(Settings(chroma_db_impl="duckdb+parquet",
                                 ))
 print(client.list_collections())
 
-
-
-
+# 500 B >> 0:01:52.234847
