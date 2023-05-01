@@ -5,6 +5,7 @@ import random
 from datetime import datetime
 import chromadb
 from chromadb.config import Settings
+import multiprocessing as mp
 
 app = Flask(__name__)  
 
@@ -41,7 +42,7 @@ def success():
                 return_msg = gpt4allretrieve(savedfile,query)
 
            elif((model == '1') and (usecase == '2')):
-              
+                
                return_msg = gpt4allsummarize(savedfile)    
 # GPT4All insert the file in Chroma DB
 
@@ -101,7 +102,7 @@ def gpt4allretrieve(savedfile, query):
   # Retrieve with source document
   # qa = RetrievalQA.from_chain_type(llm=GPT4All(model=GPT4ALL_MODEL_PATH, n_ctx=1024, n_threads=8), chain_type="stuff", retriever=retriever, return_source_documents=True)
   # Retrieve without source document
-  qa = RetrievalQA.from_chain_type(llm=GPT4All(model=GPT4ALL_MODEL_PATH, n_ctx=1024, n_threads=8, n_batch=2, temp=0.9), chain_type="stuff", retriever=retriever, return_source_documents=False)
+  qa = RetrievalQA.from_chain_type(llm=GPT4All(model=GPT4ALL_MODEL_PATH, n_ctx=1024, n_threads=6, n_batch=2, temp=0.9), chain_type="stuff", retriever=retriever, return_source_documents=False)
   result = qa({"query": query})
   return result
 
@@ -110,17 +111,23 @@ def gpt4allsummarize(savedfile):
     from langchain.text_splitter import CharacterTextSplitter
     from langchain.chains.mapreduce import MapReduceChain
     from langchain.prompts import PromptTemplate
-    llm=GPT4All(model=GPT4ALL_MODEL_PATH, n_ctx=3500, n_threads=8, temp=0.9)
-    text_splitter = CharacterTextSplitter()
-    with open(savedfile) as f:
-      doc_to_summarize = f.read()
-      texts = text_splitter.split_text(doc_to_summarize)
-    
     from langchain.docstore.document import Document
-    docs = [Document(page_content=t) for t in texts[:3]]
     from langchain.chains.summarize import load_summarize_chain
-    chain = load_summarize_chain(llm, chain_type="stuff")
-    return str(chain.run(docs))
-    
+    llm=GPT4All(model=GPT4ALL_MODEL_PATH, n_ctx=3500, n_threads=6, temp=0.5)
+    text_splitter = CharacterTextSplitter()
+    # Split the file into smaller chunks of 500 bytes each and then summarize each chunk
+    CHUNK_SIZE = 1000
+    SUMMARY = ''
+    with open(savedfile) as f:
+      doc_to_summarize = f.read(CHUNK_SIZE)
+      while doc_to_summarize:
+        texts = text_splitter.split_text(doc_to_summarize)
+        docs = [Document(page_content=t) for t in texts[:3]]
+        chain = load_summarize_chain(llm, chain_type="map_reduce")
+        SUMMARY = chain.run(docs)
+        print(SUMMARY)
+    return str(SUMMARY)
+        
+
 if __name__ == '__main__':  
     app.run(debug=True)
